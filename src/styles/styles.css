@@ -72,12 +72,14 @@ img {
 }
 
 .SearchForm-button {
+  padding: 0;
   display: inline-block;
+  position: relative;
   width: 48px;
   height: 48px;
   border: 0;
-  background-image: url('https://image.flaticon.com/icons/svg/149/149852.svg');
-  background-size: 40%;
+  /* background-image: url('https://image.flaticon.com/icons/svg/149/149852.svg'); */
+  /* background-size: 40%; */
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.6;
@@ -90,16 +92,40 @@ img {
   opacity: 1;
 }
 
+.SearchForm-button:disabled {
+  background-color: #3f51b5;
+}
+
 .SearchForm-button-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+  display: block;
+  /* position: absolute; */
+  height: 100%;
+  width: 100%;
+  /* top: 50%; */
+  /* left: 50%; */
+
+  /* transform: translate(-50%, -50%); */
+  /* width: 1px; */
+  /* height: 1px; */
   padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-  border: 0;
+  /* overflow: hidden; */
+  /* clip: rect(0, 0, 0, 0); */
+  /* white-space: nowrap; */
+  /* clip-path: inset(50%); */
+  /* border: 0; */
+}
+
+.SearchForm-button-label svg {
+  /* top: 0; */
+  /* left: 0; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 25px;
+  height: 25px;
 }
 
 .SearchForm-input {
@@ -181,6 +207,9 @@ img {
 * Стили компонента Buton (Load more)
 */
 .Button {
+  width: 100px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 8px 16px;
   border-radius: 2px;
   background-color: #3f51b5;
@@ -204,4 +233,11 @@ img {
 .Button:hover,
 .Button:focus {
   background-color: #303f9f;
+}
+
+.Loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* transform: translate(-50%, -50%); */
 }
