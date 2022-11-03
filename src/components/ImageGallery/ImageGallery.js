@@ -27,28 +27,11 @@ class ImageGallery extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    // if (prevProps.query !== this.props.query) {
-    //   // this.setState({ page: 1, images: [] });
-
-    //   const newImages = await this.fetch(this.props.query, 1);
-    //   this.setState({ page: 1, images: newImages });
-    // }
-
-    // if (
-    //   prevProps.query === this.props.query &&
-    //   prevState.page !== this.state.page
-    // ) {
-    //   const newImages = await this.fetch(this.props.query, this.state.page);
-    //   this.setState({
-    //     images: [...prevState.images, ...newImages],
-    //   });
-    // }
-    //-----------------------
-
     if (
       prevProps.query === this.props.query &&
       prevState.page === this.state.page
     ) {
+      console.log('both equal');
       return;
     }
 
@@ -57,6 +40,7 @@ class ImageGallery extends Component {
 
     if (prevProps.query !== this.props.query) {
       this.setState({ page: 1 });
+      console.log('new query, page set to 1 ?:', this.state.page);
     }
 
     if (
@@ -65,10 +49,20 @@ class ImageGallery extends Component {
     ) {
       currentPage = this.state.page;
       currentImages = prevState.images;
+      console.log(
+        `equal query: ${prevProps.query} and ${this.props.query}, new page. prevPage= ${prevState.page}, new page= ${currentPage}`
+      );
     }
 
+    console.log(`current images = `, currentImages);
+
     try {
-      this.setState({ loading: true });
+      this.setState({ status: this.STATUS.PENDING });
+
+      if (this.props.query === '') {
+        throw new Error('Empty search query :(');
+      }
+
       const newImages = await this.fetch(this.props.query, currentPage);
 
       if (newImages.length === 0) {
@@ -80,49 +74,14 @@ class ImageGallery extends Component {
       this.setState({
         images: [...currentImages, ...newImages],
         error: null,
+        status: this.STATUS.RESOLVED,
       });
     } catch (error) {
-      this.setState({ error: error });
+      this.setState({ error: error, status: this.STATUS.REJECTED });
       console.log(error);
     } finally {
-      this.setState({ loading: false });
+      // this.setState({ loading: false });
     }
-
-    // const prevQuery = prevProps.query;
-    // const prevPage = prevState.page;
-
-    // const nextQuery = this.props.query;
-    // const nextPage = this.state.page;
-
-    // if (prevQuery === nextQuery && prevPage === nextPage) {
-    //   return;
-    // }
-
-    // if (prevQuery !== nextQuery) {
-    //   this.setState({ page: 1, images: [] });
-    // }
-
-    // try {
-    //   this.setState({ loading: true });
-    //   const result = await api(nextQuery, nextPage);
-    //   const newImages = result.hits;
-
-    //   if (newImages.length === 0) {
-    //     throw new Error(
-    //       'Found zero images by this request! Please, try less silly request :)'
-    //     );
-    //   }
-
-    //   this.setState(prevState => ({
-    //     images: [...prevState.images, ...newImages],
-    //     error: null,
-    //   }));
-    // } catch (error) {
-    //   this.setState({ error: error });
-    //   // console.log('catch', error);
-    // } finally {
-    //   this.setState({ loading: false });
-    // }
   }
 
   onLoadMoreClick = () => {
@@ -130,33 +89,66 @@ class ImageGallery extends Component {
   };
 
   render() {
-    // const { items } = this.props;
     const { STATUS } = this;
-    const { error, loading, images } = this.state;
-    return (
-      <>
-        {error && (
-          <div style={{ textAlign: 'center' }}>
-            <h2>Sorry! Something went wrong.</h2> <p>{error.message} </p>
-          </div>
-        )}
+    const { error, loading, images, status } = this.state;
 
-        {loading && <Loader />}
+    console.log(`RENDER-> query ${this.props.query}, page ${this.state.page}`);
 
-        {images.length > 0 && (
-          <>
-            <ul className="gallery ImageGallery">
-              {images.map(({ id, webformatURL: imageUrl, tags }) => (
-                <li key={id} className="gallery-item ImageGalleryItem">
-                  <ImageGalleryItem src={imageUrl} alt={tags} />
-                </li>
-              ))}
-            </ul>
-            <Button onClick={this.onLoadMoreClick} />
-          </>
-        )}
-      </>
-    );
+    if (status === STATUS.IDLE) {
+      return <p>There are no images here yet. Search something</p>;
+    }
+
+    if (status === STATUS.PENDING) {
+      return <Loader />;
+    }
+
+    if (status === STATUS.REJECTED) {
+      return (
+        <div style={{ textAlign: 'center' }}>
+          <h2>Sorry! Something went wrong.</h2> <p>{error.message} </p>
+        </div>
+      );
+    }
+
+    if (status === STATUS.RESOLVED) {
+      return (
+        <>
+          <ul className="gallery ImageGallery">
+            {images.map(({ id, webformatURL: imageUrl, tags }) => (
+              <li key={imageUrl} className="gallery-item ImageGalleryItem">
+                <ImageGalleryItem src={imageUrl} alt={tags} />
+              </li>
+            ))}
+          </ul>
+          <Button onClick={this.onLoadMoreClick} isLoading={loading} />
+        </>
+      );
+    }
+
+    // return (
+    //   <>
+    //     {error && (
+    //       <div style={{ textAlign: 'center' }}>
+    //         <h2>Sorry! Something went wrong.</h2> <p>{error.message} </p>
+    //       </div>
+    //     )}
+
+    //     {loading && <Loader />}
+
+    //     {images.length > 0 && (
+    //       <>
+    //         <ul className="gallery ImageGallery">
+    //           {images.map(({ id, webformatURL: imageUrl, tags }) => (
+    //             <li key={imageUrl} className="gallery-item ImageGalleryItem">
+    //               <ImageGalleryItem src={imageUrl} alt={tags} />
+    //             </li>
+    //           ))}
+    //         </ul>
+    //         <Button onClick={this.onLoadMoreClick} isLoading={loading} />
+    //       </>
+    //     )}
+    //   </>
+    // );
   }
 }
 

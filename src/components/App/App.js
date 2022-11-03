@@ -15,8 +15,6 @@ class App extends Component {
   };
 
   render() {
-    const { images, error, loading, status } = this.state;
-
     // return (
     //   <div className="App">
     //     <Searchbar onSubmit={this.onSubmit} isSubmitting={loading} />
