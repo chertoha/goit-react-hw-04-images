@@ -44,6 +44,14 @@ class ImageGallery extends Component {
     //   });
     // }
     //-----------------------
+
+    if (
+      prevProps.query === this.props.query &&
+      prevState.page === this.state.page
+    ) {
+      return;
+    }
+
     let currentPage = 1;
     let currentImages = [];
 
