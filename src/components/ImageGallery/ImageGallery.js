@@ -92,7 +92,8 @@ class ImageGallery extends Component {
     const { STATUS } = this;
     const { error, loading, images, status } = this.state;
 
-    console.log(`RENDER-> query ${this.props.query}, page ${this.state.page}`);
+    // console.log(`RENDER-> query ${this.props.query}, page ${this.state.page}`);
+    console.log(`RENDER-> query ${images}`);
 
     if (status === STATUS.IDLE) {
       return <p>There are no images here yet. Search something</p>;
