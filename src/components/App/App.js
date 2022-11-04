@@ -15,26 +15,6 @@ class App extends Component {
   };
 
   render() {
-    // return (
-    //   <div className="App">
-    //     <Searchbar onSubmit={this.onSubmit} isSubmitting={loading} />
-    //     {error && (
-    //       <div style={{ textAlign: 'center' }}>
-    //         <h2>Sorry! Something went wrong.</h2> <p>{error.message} </p>
-    //       </div>
-    //     )}
-    //     {loading && <Loader />}
-    //     {images.length > 0 && (
-    //       <>
-    //         <ImageGallery items={images} />
-    //         <Button onClick={this.onLoadMoreClick} />
-    //       </>
-    //     )}
-
-    //     {/* <Modal /> */}
-    //   </div>
-    // );
-
     return (
       <div className="App">
         <Searchbar onSubmit={this.onSubmit} />
