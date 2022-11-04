@@ -14,5 +14,5 @@ export const api = async (query, page) => {
 
   const response = await axios.get(BASE_URL, { params });
   // console.log('api full response', response);
-  return response.data;
+  return response.data.hits;
 };
