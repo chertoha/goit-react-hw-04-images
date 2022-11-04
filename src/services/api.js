@@ -6,7 +6,7 @@ export const api = async (query, page) => {
   const params = {
     q: query,
     page: page,
-    per_page: 12,
+    per_page: 3,
     key: '30013057-0a5f6d6737818554e28c4e8f5',
     image_type: 'photo',
     orientation: 'horizontal',

@@ -27,6 +27,9 @@ class ImageGallery extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
+    console.log('didUpdate');
+    console.log(this.props.query);
+    console.log(this.state);
     if (
       prevProps.query === this.props.query &&
       prevState.page === this.state.page
@@ -35,53 +38,112 @@ class ImageGallery extends Component {
       return;
     }
 
-    let currentPage = 1;
-    let currentImages = [];
-
     if (prevProps.query !== this.props.query) {
-      this.setState({ page: 1 });
-      console.log('new query, page set to 1 ?:', this.state.page);
+      // this.setState({ page: 1 });
+      // console.log('new query, page set to 1 ?:', this.state.page);
+      try {
+        this.setState({ status: this.STATUS.PENDING });
+        // if (this.props.query === '') {
+        //   throw new Error('Empty search query :(');
+        // }
+        const newImages = await this.fetch(this.props.query, 1);
+        // if (newImages.length === 0) {
+        //   throw new Error(
+        //     'Found zero images by this request! Please, try less silly request :)'
+        //   );
+        // }
+        console.log('fetch images new query', newImages);
+        this.setState({
+          images: newImages,
+          page: 1,
+          error: null,
+          status: this.STATUS.RESOLVED,
+        });
+      } catch (error) {
+        this.setState({ error: error, status: this.STATUS.REJECTED });
+        console.log(error);
+      }
     }
 
     if (
       prevProps.query === this.props.query &&
       prevState.page !== this.state.page
     ) {
-      currentPage = this.state.page;
-      currentImages = prevState.images;
-      console.log(
-        `equal query: ${prevProps.query} and ${this.props.query}, new page. prevPage= ${prevState.page}, new page= ${currentPage}`
-      );
+      // currentPage = this.state.page;
+      // currentImages = prevState.images;
+      // console.log(
+      //   `equal query: ${prevProps.query} and ${this.props.query}, new page. prevPage= ${prevState.page}, new page= ${currentPage}`
+      // );
+      try {
+        this.setState({ status: this.STATUS.PENDING });
+        // if (this.props.query === '') {
+        //   throw new Error('Empty search query :(');
+        // }
+        const newImages = await this.fetch(this.props.query, this.state.page);
+        // if (newImages.length === 0) {
+        //   throw new Error(
+        //     'Found zero images by this request! Please, try less silly request :)'
+        //   );
+        // }
+        console.log('fetch images same query', newImages);
+        this.setState({
+          images: [...prevState.images, ...newImages],
+          error: null,
+          status: this.STATUS.RESOLVED,
+        });
+      } catch (error) {
+        this.setState({ error: error, status: this.STATUS.REJECTED });
+        console.log(error);
+      }
     }
 
-    console.log(`current images = `, currentImages);
+    // let currentPage = 1;
+    // let currentImages = [];
 
-    try {
-      this.setState({ status: this.STATUS.PENDING });
+    // if (prevProps.query !== this.props.query) {
+    //   this.setState({ page: 1 });
+    //   console.log('new query, page set to 1 ?:', this.state.page);
+    // }
 
-      if (this.props.query === '') {
-        throw new Error('Empty search query :(');
-      }
+    // if (
+    //   prevProps.query === this.props.query &&
+    //   prevState.page !== this.state.page
+    // ) {
+    //   currentPage = this.state.page;
+    //   currentImages = prevState.images;
+    //   console.log(
+    //     `equal query: ${prevProps.query} and ${this.props.query}, new page. prevPage= ${prevState.page}, new page= ${currentPage}`
+    //   );
+    // }
 
-      const newImages = await this.fetch(this.props.query, currentPage);
+    // console.log(`current images = `, currentImages);
 
-      if (newImages.length === 0) {
-        throw new Error(
-          'Found zero images by this request! Please, try less silly request :)'
-        );
-      }
+    // try {
+    //   this.setState({ status: this.STATUS.PENDING });
 
-      this.setState({
-        images: [...currentImages, ...newImages],
-        error: null,
-        status: this.STATUS.RESOLVED,
-      });
-    } catch (error) {
-      this.setState({ error: error, status: this.STATUS.REJECTED });
-      console.log(error);
-    } finally {
-      // this.setState({ loading: false });
-    }
+    //   if (this.props.query === '') {
+    //     throw new Error('Empty search query :(');
+    //   }
+
+    //   const newImages = await this.fetch(this.props.query, currentPage);
+
+    //   if (newImages.length === 0) {
+    //     throw new Error(
+    //       'Found zero images by this request! Please, try less silly request :)'
+    //     );
+    //   }
+
+    //   this.setState({
+    //     images: [...currentImages, ...newImages],
+    //     error: null,
+    //     status: this.STATUS.RESOLVED,
+    //   });
+    // } catch (error) {
+    //   this.setState({ error: error, status: this.STATUS.REJECTED });
+    //   console.log(error);
+    // } finally {
+    //   // this.setState({ loading: false });
+    // }
   }
 
   onLoadMoreClick = () => {
@@ -92,8 +154,9 @@ class ImageGallery extends Component {
     const { STATUS } = this;
     const { error, loading, images, status } = this.state;
 
+    console.log('render');
     // console.log(`RENDER-> query ${this.props.query}, page ${this.state.page}`);
-    console.log(`RENDER-> query ${images}`);
+    // console.log(`RENDER-> images`, images);
 
     if (status === STATUS.IDLE) {
       return <p>There are no images here yet. Search something</p>;
