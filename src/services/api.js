@@ -13,6 +13,6 @@ export const api = async (query, page) => {
   };
 
   const response = await axios.get(BASE_URL, { params });
-  // console.log('api full response', response);
+  // console.log(response);
   return response.data.hits;
 };
