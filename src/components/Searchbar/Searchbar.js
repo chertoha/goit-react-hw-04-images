@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { Formik, Form, Field } from 'formik';
 
-const Searchbar = ({ onSubmit }) => {
+const Searchbar = ({ onSubmit, loading = false }) => {
   const onSubmitHandle = (values, actions) => {
     onSubmit(values.query.trim());
     actions.resetForm();
@@ -14,7 +15,7 @@ const Searchbar = ({ onSubmit }) => {
           <button
             type="submit"
             className="button SearchForm-button"
-            // disabled={isSubmitting}
+            disabled={loading}
           >
             <span className="button-label SearchForm-button-label">
               <AiOutlineSearch />
@@ -35,6 +36,9 @@ const Searchbar = ({ onSubmit }) => {
   );
 };
 
-export default Searchbar;
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+};
 
-///Prop types~!!!!!!!!!!!
+export default Searchbar;

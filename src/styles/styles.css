@@ -235,9 +235,15 @@ img {
   background-color: #303f9f;
 }
 
+.Button:disabled {
+  display: none;
+}
+
 .Loader {
-  position: fixed;
-  top: 50%;
-  left: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  /* position: fixed; */
+  /* top: 50%; */
+  /* left: 50%;  */
   /* transform: translate(-50%, -50%); */
 }

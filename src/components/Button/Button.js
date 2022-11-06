@@ -1,4 +1,6 @@
-const Button = ({ onClick, isLoading }) => {
+import PropTypes from 'prop-types';
+
+const Button = ({ onClick, isLoading = false }) => {
   return (
     <button
       className="Button"
@@ -11,6 +13,9 @@ const Button = ({ onClick, isLoading }) => {
   );
 };
 
-export default Button;
+Button.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+};
 
-///Prop types~!!!!!!!!!!!
+export default Button;

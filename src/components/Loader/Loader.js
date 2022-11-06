@@ -1,18 +1,11 @@
-import { RotatingLines } from 'react-loader-spinner';
+import { InfinitySpin } from 'react-loader-spinner';
 
 const Loader = () => {
   return (
     <div className="Loader">
-      <RotatingLines
-        strokeColor="grey"
-        strokeWidth="5"
-        animationDuration="0.75"
-        width="96"
-        visible={true}
-      />
+      <InfinitySpin width="200" color="#4fa94d" />
     </div>
   );
 };
 
 export default Loader;
-///Prop types~!!!!!!!!!!!

@@ -1,5 +1,6 @@
 import ErrorComponent from 'components/ErrorComponent';
 import ImageGallery from 'components/ImageGallery';
+import Modal from 'components/Modal';
 import Searchbar from 'components/Searchbar';
 import { Component } from 'react';
 import { api } from 'services/api';
@@ -12,6 +13,8 @@ class App extends Component {
     images: [],
     error: null,
     loading: false,
+    modalOpen: false,
+    modalImage: null,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -38,9 +41,11 @@ class App extends Component {
         this.setState({ loading: false });
       }
     }
+
+    this.scrollAnimationAfterRender();
   }
 
-  onSubmit = async newQuery => {
+  onSubmitSearch = newQuery => {
     if (newQuery === '') {
       this.setState({ error: ERROR.EMPTY_SEARCH, images: [] });
       return;
@@ -54,12 +59,34 @@ class App extends Component {
     }));
   };
 
+  onImageClick = imageData => {
+    this.setState({ modalImage: imageData, modalOpen: true });
+  };
+
+  onModalClose = () => {
+    this.setState({ modalOpen: false });
+  };
+
+  scrollAnimationAfterRender = () => {
+    const gallery = document.querySelector('.ImageGallery');
+
+    if (gallery) {
+      const { height: cardHeight } =
+        gallery.firstElementChild.getBoundingClientRect();
+
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   render() {
-    const { query, images, error, loading } = this.state;
+    const { query, images, error, loading, modalImage, modalOpen } = this.state;
 
     return (
       <div className="App">
-        <Searchbar onSubmit={this.onSubmit} />
+        <Searchbar onSubmit={this.onSubmitSearch} loading={loading} />
 
         {!query ? (
           <ErrorComponent title={WARNING.NOTHING_YET} text={error} />
@@ -69,30 +96,14 @@ class App extends Component {
             onLoadMore={this.onLoadMore}
             error={error}
             loading={loading}
+            onImageClick={this.onImageClick}
           />
         )}
 
-        {/* <Modal /> */}
+        {modalOpen && <Modal image={modalImage} onClose={this.onModalClose} />}
       </div>
     );
   }
 }
 
 export default App;
-
-// перед первым запросом - вывод строки "пусто"
-// первый запрос "коты"
-// запуск лоадера
-// удачный - рендер галереи
-// не удачный - рендер ошибки
-// первый рендер  - 12 картинок
-//  остановка лоадера
-// в момент работы лоадера кнопка "загрузить ещё" не доступна
-// нажатие на кнопку "загрузить ещё"
-// рендер +12 картинок по тому же запросу1
-// второй запрос "собаки"
-// очищение стейта картинок
-// фетч 12 картинок по второму запросу
-// новый рендер
-
-//Если загрузили последнюю порцию запросов - скрыть кнопку "загрузить ещё"
