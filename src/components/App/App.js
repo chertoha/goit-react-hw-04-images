@@ -2,7 +2,7 @@ import ErrorComponent from 'components/ErrorComponent';
 import ImageGallery from 'components/ImageGallery';
 import Modal from 'components/Modal';
 import Searchbar from 'components/Searchbar';
-import { Component, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from 'services/api';
 import { ERROR, WARNING } from 'utils/notification';
 import scrollAnimationAfterRender from 'utils/scrollAfterRender';
