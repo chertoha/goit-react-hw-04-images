@@ -2,108 +2,90 @@ import ErrorComponent from 'components/ErrorComponent';
 import ImageGallery from 'components/ImageGallery';
 import Modal from 'components/Modal';
 import Searchbar from 'components/Searchbar';
-import { Component } from 'react';
+import { Component, useState, useEffect } from 'react';
 import { api } from 'services/api';
 import { ERROR, WARNING } from 'utils/notification';
+import scrollAnimationAfterRender from 'utils/scrollAfterRender';
 
-class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    images: [],
-    error: null,
-    loading: false,
-    modalOpen: false,
-    modalImage: null,
+const App = () => {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const onSubmitSearch = newQuery => {
+    if (newQuery === '') {
+      setImages([]);
+      setError(ERROR.EMPTY_SEARCH);
+      return;
+    }
+
+    setImages([]);
+    setQuery(newQuery);
+    setPage(1);
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { query: prevQuery, page: prevPage } = prevState;
-    const { query: nextQuery, page: nextPage } = this.state;
+  const onLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
+  };
 
-    if (prevQuery !== nextQuery || prevPage !== nextPage) {
-      this.setState({ loading: true });
+  const onImageClick = imageData => {
+    setModalImage(imageData);
+    setIsModalOpen(true);
+  };
 
-      try {
-        const newImages = await api(nextQuery, nextPage);
+  const onModalClose = () => {
+    setIsModalOpen(false);
+  };
 
+  useEffect(() => {
+    setLoading(true);
+
+    api(query, page)
+      .then(newImages => {
         if (newImages.length === 0) {
           throw new Error(ERROR.NOT_FOUND);
         }
 
-        this.setState(({ images }) => ({
-          images: [...images, ...newImages],
-          error: null,
-        }));
-      } catch (error) {
-        this.setState({ error: error.message });
-      } finally {
-        this.setState({ loading: false });
-      }
-    }
-
-    this.scrollAnimationAfterRender();
-  }
-
-  onSubmitSearch = newQuery => {
-    if (newQuery === '') {
-      this.setState({ error: ERROR.EMPTY_SEARCH, images: [] });
-      return;
-    }
-    this.setState({ images: [], query: newQuery, page: 1 });
-  };
-
-  onLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  onImageClick = imageData => {
-    this.setState({ modalImage: imageData, modalOpen: true });
-  };
-
-  onModalClose = () => {
-    this.setState({ modalOpen: false });
-  };
-
-  scrollAnimationAfterRender = () => {
-    const gallery = document.querySelector('.ImageGallery');
-
-    if (gallery) {
-      const { height: cardHeight } =
-        gallery.firstElementChild.getBoundingClientRect();
-
-      window.scrollBy({
-        top: cardHeight * 2,
-        behavior: 'smooth',
+        setError(null);
+        setImages(prevImages => [...prevImages, ...newImages]);
+      })
+      .catch(error => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    }
-  };
+  }, [query, page]);
 
-  render() {
-    const { query, images, error, loading, modalImage, modalOpen } = this.state;
+  useEffect(() => {
+    scrollAnimationAfterRender();
+  });
 
-    return (
-      <div className="App">
-        <Searchbar onSubmit={this.onSubmitSearch} loading={loading} />
+  //==============================
 
-        {!query ? (
-          <ErrorComponent title={WARNING.NOTHING_YET} text={error} />
-        ) : (
-          <ImageGallery
-            images={images}
-            onLoadMore={this.onLoadMore}
-            error={error}
-            loading={loading}
-            onImageClick={this.onImageClick}
-          />
-        )}
+  return (
+    <div className="App">
+      <Searchbar onSubmit={onSubmitSearch} loading={loading} />
 
-        {modalOpen && <Modal image={modalImage} onClose={this.onModalClose} />}
-      </div>
-    );
-  }
-}
+      {!query ? (
+        <ErrorComponent title={WARNING.NOTHING_YET} text={error} />
+      ) : (
+        <ImageGallery
+          images={images}
+          onLoadMore={onLoadMore}
+          error={error}
+          loading={loading}
+          onImageClick={onImageClick}
+        />
+      )}
+
+      {isModalOpen && <Modal image={modalImage} onClose={onModalClose} />}
+    </div>
+  );
+};
 
 export default App;
